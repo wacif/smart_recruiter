@@ -8,16 +8,27 @@ from utils.table_utils import generate_results_table
 from config import DEFAULT_WEIGHTS
 import pandas as pd
 
+# Set page configuration for better appearance
+st.set_page_config(
+    page_title="Smart Recruiter",
+    page_icon=":mag:",
+    layout="wide",  # You can use "centered" or "wide"
+)
+
 # Initialize the Streamlit App
 st.title("Smart Recruiter - AI-Powered Candidate Screening")
+st.markdown("<style>h1 {text-align: center;}</style>", unsafe_allow_html=True)
 
 # 1. **Input Job Specifications**
 st.header("Job Specifications")
-job_spec = st.text_area("Enter the job specifications for the role", placeholder="List required skills, experience, and qualifications...")
+job_spec = st.text_area("Enter the job specifications for the role", 
+                         placeholder="List required skills, experience, and qualifications...", 
+                         height=150)
 
 # 2. **Upload Candidate Resumes**
 st.header("Upload Candidate CVs")
-uploaded_files = st.file_uploader("Upload candidate CVs (PDF only)", accept_multiple_files=True, type="pdf")
+uploaded_files = st.file_uploader("Upload candidate CVs (PDF only)", 
+                                   accept_multiple_files=True, type="pdf")
 
 # 3. **Define Scoring Weights**
 st.header("Adjust Scoring Weights")
@@ -26,6 +37,23 @@ weights = {
     'experience': st.slider("Experience Weight", 0.0, 1.0, DEFAULT_WEIGHTS['experience']),
     'soft_skills': st.slider("Soft Skills Weight", 0.0, 1.0, DEFAULT_WEIGHTS['soft_skills'])
 }
+
+# Styling for buttons
+button_style = """
+<style>
+    .stButton > button {
+        background-color: #548CD6;
+        color: white;
+        font-weight: bold;
+        border-radius: 5px;
+    }
+    .stButton > button:hover {
+        background-color: #3b6ba5;
+    }
+</style>
+"""
+
+st.markdown(button_style, unsafe_allow_html=True)
 
 # 4. **Process Candidates**
 if st.button("Analyze Candidates"):
@@ -60,20 +88,23 @@ if st.button("Analyze Candidates"):
         })
 
     # Display results in a table
-    results_df = pd.DataFrame(results)
-    st.subheader("Candidate Analysis Results")
-    st.write(results_df)
+    if results:  # Check if results are not empty
+        results_df = pd.DataFrame(results)
+        st.subheader("Candidate Analysis Results")
+        st.write(results_df)
 
-    # Option for improvement recommendations
-    if st.button("Get Improvement Recommendations"):
-        improvement_recs = []
-        for result in results:
-            recommendation = get_improvement_recommendations(result["Skills Analysis"])
-            improvement_recs.append({
-                "Candidate": result["Candidate"],
-                "Recommendation": recommendation
-            })
-        
-        recs_df = pd.DataFrame(improvement_recs)
-        st.subheader("Improvement Recommendations")
-        st.write(recs_df)
+        # Option for improvement recommendations
+        if st.button("Get Improvement Recommendations"):
+            improvement_recs = []
+            for result in results:
+                recommendation = get_improvement_recommendations(result["Skills Analysis"])
+                improvement_recs.append({
+                    "Candidate": result["Candidate"],
+                    "Recommendation": recommendation
+                })
+            
+            recs_df = pd.DataFrame(improvement_recs)
+            st.subheader("Improvement Recommendations")
+            st.write(recs_df)
+    else:
+        st.warning("No candidates uploaded for analysis.")
