@@ -1,6 +1,13 @@
 # candidate_matching.py
 
-import groq
+import os
+from groq import Groq
+import streamlit as st
+
+# Initialize the Groq client
+client = Groq(
+    api_key=st.secrets["GROQ_API_KEY"],
+)
 
 def analyze_candidate_skills(profile_text, job_spec):
     # Prepare a dynamic prompt tailored to each resume
@@ -10,14 +17,17 @@ def analyze_candidate_skills(profile_text, job_spec):
         "Identify relevant skills, years of experience, and any mention of soft skills. Provide a summary and an evaluation score."
     )
 
-    response = openai.chat.completion.create(
-        model="llama-3.2-90b-vision-preview",  # Use the desired LLM model
+    # Create the chat completion using Groq
+    chat_completion = client.chat.completions.create(
         messages=[
-            {"role": "system", "content": "You are a helpful AI model skilled at evaluating resumes based on job requirements."},
-            {"role": "user", "content": prompt}
-        ]
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        ],
+        model="llama-3.2-90b-vision-preview", 
     )
 
     # Extract response
-    analysis = response.choices[0].message['content']
+    analysis = chat_completion.choices[0].message.content
     return analysis
