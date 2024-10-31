@@ -1,7 +1,7 @@
 import os
 
 # Groq API key
-# GROQ_API_KEY = st.secrets("GROQ_API_KEY")
+GROQ_API_KEY = st.secrets("GROQ_API_KEY")
 
 # Default scoring weights
 DEFAULT_WEIGHTS = {
