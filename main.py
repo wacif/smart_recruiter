@@ -2,10 +2,8 @@
 
 import streamlit as st
 from src.pdf_processing import extract_text_from_pdf
-from src.scoring import weighted_score
+from src.scoring import weighted_score, extract_scores_from_analysis
 from src.candidate_matching import analyze_candidate_skills, get_improvement_recommendations
-from utils.table_utils import generate_results_table
-from config import DEFAULT_WEIGHTS
 import pandas as pd
 
 # Initialize the Streamlit App
@@ -22,12 +20,12 @@ uploaded_files = st.file_uploader("Upload candidate CVs (PDF only)", accept_mult
 # 3. **Define Scoring Weights**
 st.header("Adjust Scoring Weights")
 weights = {
-    'skills': st.slider("Skills Weight", 0.0, 1.0, DEFAULT_WEIGHTS['skills']),
-    'experience': st.slider("Experience Weight", 0.0, 1.0, DEFAULT_WEIGHTS['experience']),
-    'soft_skills': st.slider("Soft Skills Weight", 0.0, 1.0, DEFAULT_WEIGHTS['soft_skills'])
+    'skills': st.slider("Skills Weight", 0.0, 1.0, 0.5),
+    'experience': st.slider("Experience Weight", 0.0, 1.0, 0.3),
+    'soft_skills': st.slider("Soft Skills Weight", 0.0, 1.0, 0.2)
 }
 
-# 4. **Function to Determine Suitability Degree**
+# 4. **Determine Suitability Degree Function**
 def determine_suitability(final_score):
     if final_score >= 8:
         return "Highly Suitable"
@@ -36,7 +34,7 @@ def determine_suitability(final_score):
     else:
         return "Less Suitable"
 
-# 5. **Process Candidates**
+# 5. **Analyze Candidates and Display Results**
 if st.button("Analyze Candidates"):
     results = []
     for uploaded_file in uploaded_files:
@@ -46,20 +44,11 @@ if st.button("Analyze Candidates"):
         # Analyze candidate skills and job match
         skill_analysis = analyze_candidate_skills(profile_text, job_spec)
 
-        # Example placeholder scores; replace with scoring logic
-        candidate_scores = {
-            'skills_score': 7,  # Static example score; replace with actual logic
-            'experience_score': 6,
-            'soft_skills_score': 8
-        }
+        # Extract individual scores from the analysis text
+        skills_score, experience_score, soft_skills_score = extract_scores_from_analysis(skill_analysis)
 
         # Calculate final weighted score
-        final_score = weighted_score(
-            candidate_scores['skills_score'],
-            candidate_scores['experience_score'],
-            candidate_scores['soft_skills_score'],
-            weights
-        )
+        final_score = weighted_score(skills_score, experience_score, soft_skills_score, weights)
 
         # Determine suitability degree
         suitability = determine_suitability(final_score)
