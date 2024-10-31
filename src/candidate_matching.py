@@ -6,7 +6,7 @@ import streamlit as st
 
 # Initialize the Groq client
 client = Groq(
-    api_key=st.secrets["GROQ_API_KEY"],
+    api_key=st.secrets["GROQ_API_KEY"]
 )
 
 def analyze_candidate_skills(profile_text, job_spec):
