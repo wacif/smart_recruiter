@@ -31,3 +31,7 @@ def analyze_candidate_skills(profile_text, job_spec):
     # Extract response
     analysis = chat_completion.choices[0].message.content
     return analysis
+
+def get_improvement_recommendations(resume_data):
+    # Placeholder function
+    return "Recommendations will be implemented later."
