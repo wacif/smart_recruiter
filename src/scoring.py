@@ -1,3 +1,5 @@
+# scoring.py
+
 import re
 
 def extract_scores_from_analysis(analysis_text):
@@ -6,7 +8,7 @@ def extract_scores_from_analysis(analysis_text):
     experience_score = 0
     soft_skills_score = 0
 
-    # Try to extract scores using regex
+    # Extract scores using regex
     try:
         skills_score = int(re.search(r"Skills Score: (\d+)", analysis_text).group(1))
     except AttributeError:
@@ -23,3 +25,14 @@ def extract_scores_from_analysis(analysis_text):
         print("Soft Skills Score not found in analysis text.")
 
     return skills_score, experience_score, soft_skills_score
+
+def weighted_score(skills_score, experience_score, soft_skills_score, weights):
+    # Calculate weighted score based on provided weights
+    total_weight = weights['skills'] + weights['experience'] + weights['soft_skills']
+    weighted_total = (
+        skills_score * weights['skills'] +
+        experience_score * weights['experience'] +
+        soft_skills_score * weights['soft_skills']
+    )
+    
+    return weighted_total / total_weight if total_weight > 0 else 0
