@@ -8,27 +8,16 @@ from utils.table_utils import generate_results_table
 from config import DEFAULT_WEIGHTS
 import pandas as pd
 
-# Set page configuration for better appearance
-st.set_page_config(
-    page_title="Smart Recruiter",
-    page_icon=":mag:",
-    layout="wide",  # You can use "centered" or "wide"
-)
-
 # Initialize the Streamlit App
 st.title("Smart Recruiter - AI-Powered Candidate Screening")
-st.markdown("<style>h1 {text-align: center;}</style>", unsafe_allow_html=True)
 
 # 1. **Input Job Specifications**
 st.header("Job Specifications")
-job_spec = st.text_area("Enter the job specifications for the role", 
-                         placeholder="List required skills, experience, and qualifications...", 
-                         height=150)
+job_spec = st.text_area("Enter the job specifications for the role", placeholder="List required skills, experience, and qualifications...")
 
 # 2. **Upload Candidate Resumes**
 st.header("Upload Candidate CVs")
-uploaded_files = st.file_uploader("Upload candidate CVs (PDF only)", 
-                                   accept_multiple_files=True, type="pdf")
+uploaded_files = st.file_uploader("Upload candidate CVs (PDF only)", accept_multiple_files=True, type="pdf")
 
 # 3. **Define Scoring Weights**
 st.header("Adjust Scoring Weights")
@@ -38,24 +27,16 @@ weights = {
     'soft_skills': st.slider("Soft Skills Weight", 0.0, 1.0, DEFAULT_WEIGHTS['soft_skills'])
 }
 
-# Styling for buttons
-button_style = """
-<style>
-    .stButton > button {
-        background-color: #548CD6;
-        color: white;
-        font-weight: bold;
-        border-radius: 5px;
-    }
-    .stButton > button:hover {
-        background-color: #3b6ba5;
-    }
-</style>
-"""
+# 4. **Function to Determine Suitability Degree**
+def determine_suitability(final_score):
+    if final_score >= 8:
+        return "Highly Suitable"
+    elif 5 <= final_score < 8:
+        return "Moderately Suitable"
+    else:
+        return "Less Suitable"
 
-st.markdown(button_style, unsafe_allow_html=True)
-
-# 4. **Process Candidates**
+# 5. **Process Candidates**
 if st.button("Analyze Candidates"):
     results = []
     for uploaded_file in uploaded_files:
@@ -80,31 +61,33 @@ if st.button("Analyze Candidates"):
             weights
         )
 
+        # Determine suitability degree
+        suitability = determine_suitability(final_score)
+
         # Append candidate results to the list
         results.append({
             "Candidate": uploaded_file.name,
             "Skills Analysis": skill_analysis,
-            "Final Score": final_score
+            "Final Score": final_score,
+            "Suitability": suitability
         })
 
     # Display results in a table
-    if results:  # Check if results are not empty
-        results_df = pd.DataFrame(results)
-        st.subheader("Candidate Analysis Results")
-        st.write(results_df)
+    results_df = pd.DataFrame(results)
+    st.subheader("Candidate Analysis Results")
+    st.write(results_df)
 
-        # Option for improvement recommendations
-        if st.button("Get Improvement Recommendations"):
-            improvement_recs = []
-            for result in results:
-                recommendation = get_improvement_recommendations(result["Skills Analysis"])
-                improvement_recs.append({
-                    "Candidate": result["Candidate"],
-                    "Recommendation": recommendation
-                })
-            
-            recs_df = pd.DataFrame(improvement_recs)
-            st.subheader("Improvement Recommendations")
-            st.write(recs_df)
-    else:
-        st.warning("No candidates uploaded for analysis.")
+    # Option for improvement recommendations
+    if st.button("Get Improvement Recommendations"):
+        improvement_recs = []
+        for result in results:
+            recommendation = get_improvement_recommendations(result["Skills Analysis"])
+            improvement_recs.append({
+                "Candidate": result["Candidate"],
+                "Recommendation": recommendation
+            })
+
+        # Display improvement recommendations
+        recs_df = pd.DataFrame(improvement_recs)
+        st.subheader("Improvement Recommendations")
+        st.write(recs_df)
