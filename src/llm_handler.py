@@ -4,7 +4,7 @@ import os
 from groq import Groq
 
 # Initialize the Groq client with the API key
-api_key = st.secrets("GROQ_API_KEY")
+api_key = st.secrets["GROQ_API_KEY"]
 client = Groq(
     api_key=api_key)
 
