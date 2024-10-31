@@ -1,0 +1,5 @@
+groq
+streamlit
+pandas
+cryptography
+pymupdf
