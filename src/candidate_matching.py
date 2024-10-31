@@ -1,17 +1,23 @@
-# src/candidate_matching.py
+# candidate_matching.py
 
-from src.llm_handler import call_groq_api
+import openai
 
 def analyze_candidate_skills(profile_text, job_spec):
-    """Analyzes candidate skills based on job specs using Groq API."""
-    messages = [
-        {"role": "user", "content": f"Analyze and list the skills relevant to this job specification:\n{job_spec}\n\nCandidate profile:\n{profile_text}"}
-    ]
-    return call_groq_api(messages)
+    # Prepare a dynamic prompt tailored to each resume
+    prompt = (
+        f"Analyze the following resume text and assess how well it matches these job specifications: {job_spec}\n\n"
+        f"Resume:\n{profile_text}\n\n"
+        "Identify relevant skills, years of experience, and any mention of soft skills. Provide a summary and an evaluation score."
+    )
 
-def get_improvement_recommendations(profile_text):
-    """Suggests improvements to enhance candidate profile score using Groq API."""
-    messages = [
-        {"role": "user", "content": f"Suggest ways for this candidate to improve their score:\n{profile_text}"}
-    ]
-    return call_groq_api(messages)
+    response = openai.chat.completion.create(
+        model="llama-3.2-90b-vision-preview",  # Use the desired LLM model
+        messages=[
+            {"role": "system", "content": "You are a helpful AI model skilled at evaluating resumes based on job requirements."},
+            {"role": "user", "content": prompt}
+        ]
+    )
+
+    # Extract response
+    analysis = response.choices[0].message['content']
+    return analysis
