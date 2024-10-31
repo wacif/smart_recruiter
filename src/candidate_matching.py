@@ -1,6 +1,6 @@
 # candidate_matching.py
 
-import openai
+import groq
 
 def analyze_candidate_skills(profile_text, job_spec):
     # Prepare a dynamic prompt tailored to each resume
