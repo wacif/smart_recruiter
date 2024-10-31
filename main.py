@@ -5,6 +5,7 @@ from src.pdf_processing import extract_text_from_pdf
 from src.scoring import weighted_score, extract_scores_from_analysis
 from src.candidate_matching import analyze_candidate_skills, get_improvement_recommendations
 import pandas as pd
+from .src.candidate_matching import analyze_candidate_skills, get_improvement_recommendations
 
 # Initialize the Streamlit App
 st.title("Smart Recruiter - AI-Powered Candidate Screening")
