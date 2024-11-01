@@ -80,7 +80,7 @@ if 'results' in st.session_state and st.session_state.results:
     if st.button("Get Improvement Recommendations"):
         st.session_state.improvement_recs.clear()  # Clear previous improvements to avoid duplication issues
         for result in st.session_state.results:
-            if result["Suitability"] != "Less Suitable":
+            if result["Suitability"] != "Highly Suitable":
                 recommendation = get_improvement_recommendations(result["Skills Analysis"], job_spec)
                 st.session_state.improvement_recs.append({
                     "Candidate": result["Candidate"],
