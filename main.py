@@ -37,7 +37,7 @@ def determine_suitability(final_score):
 
 # 5. **Analyze Candidates and Display Results**
 if st.button("Analyze Candidates"):
-    results = []
+    st.session_state.results = []
     for uploaded_file in uploaded_files:
         # Extract text from PDF
         profile_text = extract_text_from_pdf(uploaded_file)
@@ -55,7 +55,7 @@ if st.button("Analyze Candidates"):
         suitability = determine_suitability(final_score)
 
         # Append candidate results to the list
-        results.append({
+        st.session_state.results.append({
             "Candidate": uploaded_file.name,
             "Skills Analysis": skill_analysis,
             "Final Score": final_score,
@@ -63,14 +63,14 @@ if st.button("Analyze Candidates"):
         })
 
     # Display results in a table
-    results_df = pd.DataFrame(results)
+    results_df = pd.DataFrame(st.session_state.results)
     st.subheader("Candidate Analysis Results")
     st.write(results_df)
 
     # Provide recommendations only to those who are not "Highly Suitable"
     if st.button("Get Improvement Recommendations"):
         improvement_recs = []
-        for result in results:
+        for result in st.session_state.results:
             if result["Suitability"] != "Highly Suitable":
                 recommendation = get_improvement_recommendations(result["Skills Analysis"], job_spec)
                 improvement_recs.append({
