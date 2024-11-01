@@ -35,9 +35,16 @@ def determine_suitability(final_score):
     else:
         return "Less Suitable"
 
+# Ensure session state initialization
+if 'results' not in st.session_state:
+    st.session_state.results = []
+
+if 'improvement_recs' not in st.session_state:
+    st.session_state.improvement_recs = []
+
 # 5. **Analyze Candidates and Display Results**
 if st.button("Analyze Candidates"):
-    st.session_state.results = []
+    st.session_state.results.clear()  # Clear previous results to avoid duplication issues
     for uploaded_file in uploaded_files:
         # Extract text from PDF
         profile_text = extract_text_from_pdf(uploaded_file)
@@ -54,7 +61,7 @@ if st.button("Analyze Candidates"):
         # Determine suitability degree
         suitability = determine_suitability(final_score)
 
-        # Append candidate results to the list
+        # Append candidate results to the session state
         st.session_state.results.append({
             "Candidate": uploaded_file.name,
             "Skills Analysis": skill_analysis,
@@ -67,18 +74,21 @@ if st.button("Analyze Candidates"):
     st.subheader("Candidate Analysis Results")
     st.write(results_df)
 
-    # Provide recommendations only to those who are not "Highly Suitable"
+# Check before using 'results' in session state
+if 'results' in st.session_state and st.session_state.results:
+    # Option for improvement recommendations
     if st.button("Get Improvement Recommendations"):
-        improvement_recs = []
+        st.session_state.improvement_recs.clear()  # Clear previous improvements to avoid duplication issues
         for result in st.session_state.results:
             if result["Suitability"] != "Highly Suitable":
                 recommendation = get_improvement_recommendations(result["Skills Analysis"], job_spec)
-                improvement_recs.append({
+                st.session_state.improvement_recs.append({
                     "Candidate": result["Candidate"],
                     "Recommendation": recommendation
                 })
 
         # Display improvement recommendations
-        recs_df = pd.DataFrame(improvement_recs)
-        st.subheader("Improvement Recommendations")
-        st.write(recs_df)
+        if st.session_state.improvement_recs:
+            recs_df = pd.DataFrame(st.session_state.improvement_recs)
+            st.subheader("Improvement Recommendations")
+            st.write(recs_df)
