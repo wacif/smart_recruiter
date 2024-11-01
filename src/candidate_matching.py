@@ -65,6 +65,34 @@ def extract_scores_from_analysis(analysis_text):
 
     return skills_score, experience_score, soft_skills_score
 
-def get_improvement_recommendations(resume_data):
-    # Placeholder function
-    return "Recommendations will be implemented later."
+def get_improvement_recommendations(candidate_data, job_spec):
+    """
+    This function utilizes a language model to offer tailored career improvement
+    suggestions for a candidate based on job specifications.
+    """
+
+    # Prepare the prompt for the LLM with candidate analysis and job specifications
+    prompt = (
+        f"Analyze the following candidate data and job specifications and provide "
+        f"recommendations for improvement: Job Specifications: {job_spec}\n"
+        f"Candidate Data: {candidate_data}\n"
+        "Offer detailed suggestions for skills, experiences, or soft skills that "
+        "the candidate should enhance or acquire to improve their suitability for "
+        "a similar job in the future."
+    )
+
+    # Create the chat completion using Groq
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        ],
+        model="llama-3.2-90b-vision-preview", 
+    )
+
+    # Extract response for recommendations
+    recommendations = chat_completion.choices[0].message.content
+
+    return recommendations

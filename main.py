@@ -67,15 +67,16 @@ if st.button("Analyze Candidates"):
     st.subheader("Candidate Analysis Results")
     st.write(results_df)
 
-    # Option for improvement recommendations
+    # Provide recommendations only to those who are not "Highly Suitable"
     if st.button("Get Improvement Recommendations"):
         improvement_recs = []
         for result in results:
-            recommendation = get_improvement_recommendations(result["Skills Analysis"])
-            improvement_recs.append({
-                "Candidate": result["Candidate"],
-                "Recommendation": recommendation
-            })
+            if result["Suitability"] != "Highly Suitable":
+                recommendation = get_improvement_recommendations(result["Skills Analysis"], job_spec)
+                improvement_recs.append({
+                    "Candidate": result["Candidate"],
+                    "Recommendation": recommendation
+                })
 
         # Display improvement recommendations
         recs_df = pd.DataFrame(improvement_recs)
